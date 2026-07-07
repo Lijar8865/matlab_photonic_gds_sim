@@ -1,0 +1,13 @@
+output/
+tempfig/
+.codex/
+__pycache__/
+*.log
+para_save.mat
+matlab2fdtd_data.mat
+matlab_to_hfss.json
+parameters.txt
+sim_result.aedt
+*.aedtresults/
+examples/**/share/
+*.gds

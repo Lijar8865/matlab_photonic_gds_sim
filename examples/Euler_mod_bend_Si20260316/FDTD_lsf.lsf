@@ -1,0 +1,140 @@
+clc;clear;
+matlabload("matlab2fdtd_data.mat");# load the para
+cd(sim_file_path);
+# load(sim_file_name); 
+switchtolayout;
+my_fdtd_function; # load the function
+material_Si="Si (Silicon) - Palik";
+
+h_wg = para.h_wg*1e-6;
+select("mat_group");
+delete;
+select("port_group");
+delete;
+
+addgroup;
+set("name","port_group");
+for(i = 1:length(port_xy_dir)) {
+    select("in");
+    copy;
+    port_name = "port_" + num2str(i);
+    set("name", port_name);
+    set("x", port_xy_list(i,1));
+    set("y", port_xy_list(i,2));
+    set("z", 0);
+    set("monitor type", "2D " + substring(port_xy_dir,i,1) + "-normal");  # 直接拼接字符串
+    addtogroup("port_group");
+    
+    # 设置模式分析器
+    select("in_mode");
+    copy;
+    set("name", port_name+"_mode");
+    set("x", port_xy_list(i,1));
+    set("y", port_xy_list(i,2));
+    set("z", 0);
+    setexpansion(port_name, "port_group::"+port_name);
+    set("monitor type", "2D " + substring(port_xy_dir,i,1) + "-normal");  # 直接拼接字符串
+    addtogroup("port_group");
+}
+
+select("source");
+set("x",port_xy_list(1,1)-0e-6);
+set("y",port_xy_list(1,2));
+select("in");
+set("x",port_xy_list(1,1)+5e-6);
+set("y",port_xy_list(1,2));
+select("in_mode");
+set("x",port_xy_list(1,1)+5e-6);
+set("y",port_xy_list(1,2));
+
+select("FDTD");
+set("x min",sim_edge_xy(1,1));
+set("x max",sim_edge_xy(2,1));
+set("y min",sim_edge_xy(1,2));
+set("y max",sim_edge_xy(2,2));
+set("z",0);
+
+select("zcut");
+set("x min",sim_edge_xy(1,1));
+set("x max",sim_edge_xy(2,1));
+set("y min",sim_edge_xy(1,2));
+set("y max",sim_edge_xy(2,2));
+set("z",h_wg/2);
+
+select("index");
+set("x min",sim_edge_xy(1,1));
+set("x max",sim_edge_xy(2,1));
+set("y min",sim_edge_xy(1,2));
+set("y max",sim_edge_xy(2,2));
+set("z",h_wg/2);
+
+
+addgroup;
+set("name","mat_group");
+
+# 获取结构数量
+# size_fdtd = size(fdtd_pos_list);
+# if(length(size_fdtd) == 3) {
+#     M = size_fdtd(3);
+# } else {
+#     M = 1;
+# }
+
+
+# 循环处理每个结构
+for(struct_idx = 1:length(fdtd_pos_list)) {
+    # 提取当前结构的顶点数据并压缩维度
+    # current_vtx = pinch(fdtd_pos_list(:,:,struct_idx));
+    current_vtx = pinch(fdtd_pos_list{struct_idx});
+    
+    # 添加平面结构
+    addplanarsolid(current_vtx, vtx2facet(current_vtx));
+    set("name", "waveguide_" + num2str(struct_idx));
+    # set("material", "LNOIxcut_why_rib");
+    set("material", material_Si);
+    set("grid attribute name", "Rotation45");
+    addtogroup("mat_group");
+}
+
+# ----------------------------------------------------------------------------------------------------
+# check the index
+if (flag_check=0){
+       index_preview = getresult("index","index preview");
+       matlabsave("index_preview.mat",index_preview);
+}
+# ----------------------------------------------------------------------------------------------------
+
+if (flag_backkup=1){# 
+       cd(sim_file_path);
+       save("bend_sim_basic_backup.fsp");# backup the file
+    #    save("bend_sim_basic.fsp");# 
+       }
+
+save(save_name_fdtd+'\'+'basic.fsp');#save the file，不占用base_sim空间
+if (flag_run){
+    run;
+    T_list = cell(length(port_xy_dir));
+        for(i = 1:length(port_xy_dir)) {
+            port_name = "port_" + num2str(i);
+            mode_name ="port_group::"+ port_name + "_mode";
+            # 检查结果是否存在
+            if (haveresult(mode_name, "expansion for " + port_name)) {
+                T_list{i} = getresult(mode_name, "expansion for " + port_name);
+            } else {
+                # 结果不存在时的处理
+                T_list{i} = 0;  # 或者设置为其他默认值
+                ?"Warning: Could not find result 'expansion for " + port_name + "' in " + mode_name;
+            }
+        }
+        # E_mat=getresult("zcut","E");
+        save;#save_again
+        #matlabsave(save_name,T_out1,T_in1,T_out2,T_in2);
+        matlabsave('basic');
+        exit;# 运行结束后退出fdtd，避免占用过多资源
+        #    save("current_sw.fsp");
+}
+
+
+
+
+

@@ -1,0 +1,24 @@
+clc;clear;
+len_port = 3;
+T_list = cell(len_port);
+for(i = 1:len_port) {
+    port_name = "port_" + num2str(i);
+    mode_name ="port_group::"+ port_name + "_mode";
+    # 检查结果是否存在
+    if (haveresult(mode_name, "expansion for " + port_name)) {
+        T_list{i} = getresult(mode_name, "expansion for " + port_name);
+    } else {
+        # 结果不存在时的处理
+        T_list{i} = 0;  # 或者设置为其他默认值
+        ?"Warning: Could not find result 'expansion for " + port_name + "' in " + mode_name;
+    }
+}
+E_mat=getresult("zcut","E");
+matlabsave('basic',T_list,E_mat);
+exit;
+
+
+
+
+
+

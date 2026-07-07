@@ -1,0 +1,53 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		// 设置工作区的颜色主题
+		//   "workbench.colorTheme": "MATLAB",  // 这里可以是你安装的 MATLAB 主题名称
+		// "window.autoDetectColorScheme": false,
+		"workbench.colorTheme": "Visual Studio Light",
+		// 设置 MATLAB 文件的语言模式（如果没有自动识别）
+		"files.associations": {
+			"*.m": "matlab"
+		},
+		// 其他自定义设置，例如修改字体、颜色等
+		"editor.tokenColorCustomizations": {
+			"textMateRules": [
+				{
+					"scope": "keyword",
+					"settings": {
+						"foreground": "#0e00ff" // 设置 MATLAB 关键字为蓝色
+					}
+				},
+				{
+					"scope": "string",
+					"settings": {
+						"foreground": "#a709f5" // 设置 MATLAB 字符串为绿色
+					}
+				},
+				{
+					"scope": "constant.numeric",
+					"settings": {
+						"foreground": "#000000" // MATLAB 数字设置为黑色
+					}
+				},
+			]
+		},
+		// 添加编辑器背景颜色设置
+		"workbench.colorCustomizations": {
+			"editor.lineHighlightBackground": "#1073cf2d",
+			"editor.lineHighlightBorder": "#9fced11f",
+			"editor.background": "#FFFFFF",
+			"editorBracketHighlight.foreground1": "#000000",
+			"editorBracketHighlight.foreground2": "#000000",
+			"editorBracketHighlight.foreground3": "#000000",
+			"editorBracketHighlight.foreground4": "#000000",
+			"editorBracketHighlight.foreground5": "#000000",
+			"editorBracketHighlight.foreground6": "#000000"
+		},
+		
+	}
+}

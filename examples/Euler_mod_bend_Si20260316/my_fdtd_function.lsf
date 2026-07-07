@@ -1,0 +1,66 @@
+
+
+################################Define Function####################################
+function vtx2facet(vtx) {
+       # vtx = mmi_down_vtx_fdtd;
+       len_vtx = size(vtx,1)/4;
+       a_axis = 1;                              #a
+       # b_axis = size(Euler_xy_pos_bo,1);        #b
+       b_axis = len_vtx;
+       c_axis = b_axis+1;                       #c
+       # d_axis = b_axis+size(Euler_xy_pos_bi,1); #d
+       d_axis = b_axis+len_vtx;
+
+       e_axis = d_axis+1;                              #a
+       # f_axis = d_axis+size(Euler_xy_pos_to,1);        #b
+       f_axis = d_axis+len_vtx;
+       g_axis = f_axis+1;                       #c
+       # h_axis = f_axis+size(Euler_xy_pos_ti,1); #d 
+       h_axis = f_axis+len_vtx;
+
+
+       # lena = -2+size(Euler_xy_pos_bo,1)+size(Euler_xy_pos_bi,1)+size(Euler_xy_pos_to,1)+size(Euler_xy_pos_ti,1);
+       lena = -2+len_vtx*4;
+
+       # Data format method 1: facet table as cell array
+       a = cell(lena);
+
+       for(i = 1:lena){
+              a{i} = cell(1);
+              }   
+              
+       for (i = a_axis:b_axis-1){
+       a{i}{1} = [a_axis+i-1,a_axis+i,d_axis-i,d_axis+1-i];   # bottom facet has two holes
+       }
+
+       for (i = a_axis:b_axis-1){
+       j=c_axis-2+i;
+       a{j}{1} = [a_axis+i-1,a_axis+i,e_axis+i,e_axis+i-1];   # outer boundary
+       }
+
+       for (i = a_axis:b_axis-1){
+       j=e_axis-3+i;
+       a{j}{1} = [c_axis+i-1,c_axis+i,g_axis+i,g_axis+i-1];    # inner boundary
+       }
+
+       for (i = a_axis:b_axis-1){
+       j=g_axis-4+i;
+       a{j}{1} = [e_axis+i-1,e_axis+i,h_axis-i,h_axis+1-i];    # top boundary
+       }
+
+       j=lena-1;
+       a{j}{1} = [a_axis,e_axis,h_axis,d_axis];   # input facet
+
+       # print('input');
+       # print(num2str(a{j}{1}));
+
+       j=lena;
+       a{j}{1} = [b_axis,f_axis,g_axis,c_axis];   # output facet
+       # a{j}{1} = [c_axis,g_axis,f_axis,b_axis];   # output facet
+
+       # print('output');
+       # print(num2str(a{j}{1}));
+       return a;
+}
+################################Function END####################################
+
